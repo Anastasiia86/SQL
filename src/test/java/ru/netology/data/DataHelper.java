@@ -10,10 +10,10 @@ import org.apache.commons.dbutils.handlers.ScalarHandler;
 import java.sql.DriverManager;
 
 public class DataHelper {
-    //Пароль qwerty123:
+
     private static final String passBase =
             "$2a$10$zXMspIdjEHrK4W4iueC2QO8XFxadTn0dsoyD5A/qyroJUcWigWsaO";
-    //Пароль qwerty123:
+
     private static final String passForm = "qwerty123";
 
     private DataHelper() {
@@ -59,7 +59,7 @@ public class DataHelper {
             var delUsersSQL = "DELETE FROM users WHERE id = ? OR id = ?;";
 
             try (var connection = DriverManager.getConnection(
-                    "jdbc:mysql://185.119.57.164:3306/base", "adm", "9mRE")) {
+                    "jdbc:mysql://localhost:3306/app", "app", "pass")) {
                 var allUsers = runner.query(connection,
                         usersSQL, new BeanListHandler<>(ru.netology.data.User.class));
                 //Проверка наличия в базе заданных пользователей:
@@ -86,7 +86,7 @@ public class DataHelper {
             var dataSQL = "INSERT INTO users(id, login, password) VALUES (?, ?, ?);";
 
             try (var connection = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/base", "adm", "9mRE")) {
+                    "jdbc:mysql://localhost:3306/app", "app", "pass")) {
                 //Создание пользователя (обычная вставка в таблицу)
                 runner.update(connection, dataSQL,
                         //Универсальный id:
@@ -108,7 +108,7 @@ public class DataHelper {
             var userSQL = "SELECT * FROM users;";
 
             try (var connection = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/base", "adm", "9mRE")) {
+                    "jdbc:mysql://localhost:3306/app", "app", "pass")) {
                 return runner.query(connection, userSQL, new BeanHandler<>(User.class));
             }
         }
@@ -123,7 +123,7 @@ public class DataHelper {
             var codeSQL = "SELECT code FROM auth_codes WHERE user_id = ?;";
 
             try (var connection = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/base", "adm", "9mRE")) {
+                    "jdbc:mysql://localhost:3306/ap", "app", "pass")) {
                 return runner.query(connection, codeSQL, user.getId(), new ScalarHandler<>());
             }
         }
@@ -140,7 +140,7 @@ public class DataHelper {
             var delAuthCodeSQL = "DELETE FROM auth_codes WHERE user_id = ?;";
 
             try (var connection = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/base", "adm", "9mRE")) {
+                    "jdbc:mysql://localhost:3306/app", "app", "pass")) {
                 var user = runner.query(connection, usersSQL, new BeanHandler<>(User.class));
                 if (user != null) {                         //Проверка наличия в базе сгенерированного пользователя
                     runner.update(connection, delAuthCodeSQL,
