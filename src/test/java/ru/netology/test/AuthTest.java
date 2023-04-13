@@ -1,51 +1,41 @@
 package ru.netology.test;
 
-
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import ru.netology.data.DataHelper;
+import ru.netology.data.SQLHelper;
 import ru.netology.page.LoginPage;
 
-import static com.codeborne.selenide.Selenide.*;
-import static ru.netology.data.DataHelper.DataBase.*;
-import static ru.netology.data.DataHelper.getInvalidPass;
-import static ru.netology.data.DataHelper.getValidPass;
+
+import static com.codeborne.selenide.Selenide.open;
+import static ru.netology.data.SQLHelper.cleanDatabase;
 
 public class AuthTest {
 
-    @BeforeAll
-    public static void setUpForSUT() {
-        clearingTablesForSUT();
+    @AfterAll
+    public static void tearDown() {
+        cleanDatabase();
     }
 
-    @BeforeEach
-    public void setUp() {
-        userGeneration();
+
+    @Test
+    @DisplayName("Авторизация с валидным логином и паролем")
+    void shouldBeSuccesfull() {
+        var loginPage = open("http://localhost:9999", LoginPage.class);
+        DataHelper.AuthInfo authInfo = DataHelper.getAuthInfo();
+        var verificationPage = loginPage.validLogin(authInfo);
+        var verificationCode = SQLHelper.getRandomVerificationCode();
+        verificationPage.validVerify(verificationCode);
+
     }
 
     @Test
-    @DisplayName("Успешная авторизация")
-    public void authTestPositive() {
-        open("http://localhost:9999");
-        var loginPage = new LoginPage();
-        var user = getUserInfo();
-        var verificationPage = loginPage.validLogin(user.getLogin(), getValidPass());
-        var code = getCode(user);
-        verificationPage.validVerify(code);
-    }
-
-    @Test
-    @DisplayName("Блокировка пользователя после трех попыток ввода невалидного пароля")
-    public void authBlocked() {
-        open("http://localhost:9999");
-        var user = getUserInfo();
-        var loginPage = new LoginPage();
-        loginPage.tripleInvalidPassword(user.getLogin(), getInvalidPass());
-    }
-
-    @AfterEach
-    public void tearDown() {
-        deletingCreatedUser();
+    @DisplayName("Авторизация с рандомным логином и паролем")
+    void shouldErrorShow() {
+        var loginPage = open("http://localhost:9999", LoginPage.class);
+        var authInfo = DataHelper.randomUser();
+        loginPage.validLogin(authInfo);
+        loginPage.verifyErrorNotificationVisibility();
     }
 }
-
-
-
