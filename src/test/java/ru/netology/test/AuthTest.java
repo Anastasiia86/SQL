@@ -38,4 +38,5 @@ public class AuthTest {
         loginPage.validLogin(authInfo);
         loginPage.verifyErrorNotificationVisibility();
     }
+
 }
